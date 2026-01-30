@@ -33,7 +33,12 @@ function isAllowed(sender, allowFrom) {
 }
 
 async function sendIMessage(recipient, text, log) {
-  const escaped = text.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n");
+  // Escape for AppleScript - but preserve actual newlines
+  const escaped = text
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\r/g, "");  // Remove carriage returns, keep \n as actual newlines
+  
   const script = `tell application "Messages" to send "${escaped}" to buddy "${recipient}" of (service 1 whose service type is iMessage)`;
   try {
     await execAsync(`osascript -e '${script.replace(/'/g, "'\"'\"'")}'`);
